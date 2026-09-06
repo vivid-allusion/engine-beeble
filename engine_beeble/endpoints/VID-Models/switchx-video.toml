@@ -1,0 +1,75 @@
+id = "switchx-video"
+label = "SwitchX Video"
+category = "VID"
+platform = "beeble"
+endpoint = "switchx-video"
+description = "Beeble SwitchX video compositing: video-to-video that drives the output from the source video's original pixels. A source video (required), optional alpha mask, and optional reference image re-skin and relight a scene while preserving what matters. Async job API: POST /v1/switchx/generations, poll GET /v1/switchx/generations/{id}."
+
+[general]
+image_url_param = "source_uri"
+slots = ["reference_image_uri", "alpha_uri"]
+required_slots = ["source_uri"]
+
+[params.generation_type]
+label = "Generation Type"
+type = "select"
+default = "video"
+hidden = true
+options = [
+  { value = "video", label = "Video" },
+  { value = "image", label = "Image" },
+]
+
+[params.alpha_mode]
+label = "Alpha Mode"
+type = "select"
+default = "auto"
+options = [
+  { value = "auto",   label = "Auto · AI detects the foreground" },
+  { value = "fill",   label = "Fill · Keep the scene as-is" },
+  { value = "select", label = "Select · Single keyframe mask" },
+  { value = "custom", label = "Custom · Full video mask" },
+]
+note = "'custom' and 'select' require alpha_uri"
+
+[params.alpha_keyframe_index]
+label = "Alpha Keyframe Index"
+type = "integer"
+default = 0
+min = 0
+max = 239
+optional = true
+hidden = true
+description = "0-based frame index for alpha propagation when alpha_mode is 'select'. Must be between 0 and frame_count - 1."
+
+[params.max_resolution]
+label = "Max Resolution"
+type = "select"
+default = "1080"
+options = [
+  { value = "720",  label = "720p" },
+  { value = "1080", label = "1080p · Default" },
+]
+
+[params.seed]
+label = "Random Seed"
+type = "integer"
+min = 0
+max = 4294967295
+optional = true
+hidden = true
+description = "Omitted → random seed (different output each run). Same seed + identical inputs → near-identical output."
+
+[params.callback_url]
+label = "Callback URL"
+type = "text"
+optional = true
+hidden = true
+description = "HTTPS webhook URL notified on completion or failure"
+
+[params.idempotency_key]
+label = "Idempotency Key"
+type = "text"
+optional = true
+hidden = true
+description = "Deterministic key per logical request; retries return the existing job instead of double-charging"

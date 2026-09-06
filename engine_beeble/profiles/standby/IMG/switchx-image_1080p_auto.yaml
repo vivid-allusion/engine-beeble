@@ -1,0 +1,13 @@
+# SwitchX Image — 1080p · Auto alpha
+platform: beeble
+endpoint: switchx-image
+media_type: image
+image_url_param: source_uri
+parameters:
+  alpha_mode: "auto"
+  generation_type: "image"
+  max_resolution: 1080
+# Pricing: TBD — no published rates in the beeble docs snapshot
+
+# Reference image: pass via InputFile.references['reference_image_uri']
+# Alpha mask: pass via InputFile.references['alpha_uri'] (custom/select modes)

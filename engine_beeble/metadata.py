@@ -1,0 +1,5 @@
+PROVIDER_NAME = "Beeble"
+PROVIDER_HOMEPAGE = "https://beeble.ai"
+PLATFORM = "beeble"
+API_KEY_ENV_VAR = "BEEBLE_API_KEY"
+API_KEY_PATTERN = r".+"
