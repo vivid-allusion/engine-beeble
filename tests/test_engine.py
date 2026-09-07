@@ -306,6 +306,49 @@ class TestEngineJobFlow:
         assert results[0].path.suffix == ".mp4"
         assert results[0].path.read_bytes() == MP4_BYTES
 
+    def test_save_alpha_downloads_alpha_matte(self, tmp_path):
+        with _requests_mock() as (mock_requests, mock_session):
+            mock_session.post.return_value = _job_response({"id": "swx_1", "status": "in_queue", "progress": 0})
+            mock_session.get.return_value = _job_response(
+                {
+                    "id": "swx_1",
+                    "status": "completed",
+                    "progress": 100,
+                    "output": {
+                        "render": "https://x/out.mp4",
+                        "alpha": "https://x/out_alpha.mp4",
+                        "source": "https://x/source.mp4",
+                    },
+                }
+            )
+            full_profile = {
+                "endpoint": "switchx-video",
+                "media_type": "video",
+                "parameters": {"save_alpha": True},
+            }
+            with patch.dict("os.environ", {"BEEBLE_API_KEY": "test-key"}):
+                with patch("time.sleep"):
+                    with patch("urllib.request.urlopen", return_value=_FakeStream(MP4_BYTES)):
+                        engine = Engine(full_profile, tmp_path)
+                        results = engine.run(
+                            [InputFile(path=Path("b.md"), prompt="test", reference_urls=["https://s.example/v.mp4"])]
+                        )
+        assert len(results) == 2
+        assert {r.status for r in results} == {"ok"}
+        names = sorted(r.path.name for r in results)
+        assert any(n.endswith("-alpha.mp4") for n in names)
+        assert any(not n.endswith("-alpha.mp4") for n in names)
+        payload = mock_session.post.call_args.kwargs["json"]
+        assert "save_alpha" not in payload
+
+    def test_save_alpha_false_skips_alpha(self, tmp_path):
+        results, _ = self._run(
+            tmp_path,
+            [InputFile(path=Path("b.md"), prompt="test", reference_urls=["https://s.example/v.mp4"])],
+        )
+        assert len(results) == 1
+        assert not results[0].path.name.endswith("-alpha.mp4")
+
     def test_job_poll_emits_progress(self, tmp_path):
         progress_calls = []
         with _requests_mock() as (mock_requests, mock_session):

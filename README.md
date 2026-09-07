@@ -85,6 +85,22 @@ Base URL: `https://api.beeble.ai/v1` (default). Override per profile with
 `base_url`. Optional profile keys: `poll_interval` (seconds, default 2) and
 `timeout_seconds` (job wait cap, 0 = no cap).
 
+## Alpha matte output
+
+Beeble returns three signed URLs per job: `render` (the composited output),
+`source` (preprocessed source), and `alpha` (the matte). By default only
+`render` is downloaded. Set `save_alpha: true` in the profile `parameters`
+to also download the alpha matte as `<name>-alpha<ext>`:
+
+```yaml
+parameters:
+  save_alpha: true
+```
+
+The matte (white = subject kept, black = background replaced) is the mask you
+use in post to make the background transparent or re-key a scene. `save_alpha`
+is engine-side only — it is never sent to the API.
+
 ## Media routing
 
 - **Primary input (required):** `source_uri` — the source video or image.

@@ -73,3 +73,10 @@ type = "text"
 optional = true
 hidden = true
 description = "Deterministic key per logical request; retries return the existing job instead of double-charging"
+
+[params.save_alpha]
+label = "Save Alpha Matte"
+type = "boolean"
+default = false
+hidden = true
+description = "Also download the output alpha matte (mask) for transparency/compositing. Never sent to the API — engine-side only."

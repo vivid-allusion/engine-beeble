@@ -54,6 +54,7 @@ class Engine:
         session.headers["x-api-key"] = self._resolve_api_key()
 
         params = dict(self._profile.get("parameters", {}))
+        save_alpha = self._save_alpha(params)
         media_type = self._profile.get("media_type", "") or "video"
         self._output_dir.mkdir(parents=True, exist_ok=True)
 
@@ -112,6 +113,7 @@ class Engine:
                     total,
                     rel_dir,
                     expected,
+                    save_alpha=save_alpha,
                 )
                 if not saved:
                     results.append(
@@ -186,6 +188,18 @@ class Engine:
                 return str(value)
         return "source_uri"
 
+    def _save_alpha(self, params: dict) -> bool:
+        """Whether to also download the job's alpha matte.
+
+        Read from the profile's parameters (``save_alpha: true``), else the
+        top-level ``save_alpha`` key. The flag is consumed here and never
+        sent to the API.
+        """
+        value = params.pop("save_alpha", None)
+        if value is None:
+            value = self._profile.get("save_alpha")
+        return bool(value)
+
     def _run_job(
         self,
         session,
@@ -198,6 +212,7 @@ class Engine:
         total: int,
         rel_dir: str,
         expected: Path,
+        save_alpha: bool = False,
     ) -> list[Path]:
         response = session.post(f"{self._base_url}{_CREATE_PATH}", json=payload, timeout=60)
         if not response.ok:
@@ -232,9 +247,26 @@ class Engine:
                 render = output.get("render")
                 if not render:
                     return []
-                return self._download(
+                saved = self._download(
                     render, media_type, stem, idx, prefix, current, total, rel_dir, payload
                 )
+                alpha = output.get("alpha")
+                if save_alpha and alpha:
+                    saved.extend(
+                        self._download(
+                            alpha,
+                            media_type,
+                            stem,
+                            idx,
+                            prefix,
+                            current,
+                            total,
+                            rel_dir,
+                            payload,
+                            tag="-alpha",
+                        )
+                    )
+                return saved
             if status == "failed":
                 raise RuntimeError(f"Job failed: {job.get('error') or 'unknown error'}")
             time.sleep(self._poll_interval)
@@ -250,6 +282,7 @@ class Engine:
         total: int,
         rel_dir: str,
         api_payload: dict | None = None,
+        tag: str = "",
     ) -> list[Path]:
         dest_dir = self._output_dir / rel_dir if rel_dir else self._output_dir
         dest_dir.mkdir(parents=True, exist_ok=True)
@@ -259,7 +292,7 @@ class Engine:
         with urllib.request.urlopen(url, timeout=300) as stream:
             data = stream.read()
         ext = self._sniff_extension(data, media_type)
-        dest = dest_dir / f"{ts}-{stem}-{idx}{ext}"
+        dest = dest_dir / f"{ts}-{stem}-{idx}{tag}{ext}"
         with open(dest, "wb") as f:
             f.write(data)
         self._emit(
