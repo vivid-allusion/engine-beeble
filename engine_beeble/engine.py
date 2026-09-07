@@ -85,7 +85,7 @@ class Engine:
                 continue
 
             if prompt:
-                self._emit(f"{prefix} 📝 Prompt: {prompt}")
+                self._emit(f"{prefix} 📝 Input: {item.path.name}")
 
             try:
                 payload = self._build_beeble_payload(params, prompt, item, media_type)

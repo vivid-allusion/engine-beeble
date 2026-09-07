@@ -209,6 +209,7 @@ class TestEngineJobFlow:
         )
         assert len(progress_calls) >= 1
         assert any("Job created: swx_1" in c.message for c in progress_calls)
+        assert any("Input: b.md" in c.message for c in progress_calls)
 
     def test_sets_api_key_header(self, tmp_path):
         results, session = self._run(
