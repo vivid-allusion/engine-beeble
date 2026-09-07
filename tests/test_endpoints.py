@@ -31,7 +31,7 @@ def _load_all() -> dict[str, list[dict]]:
 
 def test_catalog_counts():
     catalog = _load_all()
-    assert len(catalog["IMG"]) == 1
+    assert len(catalog["IMG"]) == 0
     assert len(catalog["VID"]) == 1
     assert len(catalog["TXT"]) == 0
     assert len(catalog["VISION"]) == 0
@@ -97,8 +97,7 @@ def test_generation_type_default_matches_category():
     for category, entries in catalog.items():
         for ep in entries:
             default = ep["params"]["generation_type"]["default"]
-            expected = "video" if category == "VID" else "image"
-            assert default == expected, f"{ep['id']}: generation_type default mismatch"
+            assert default == "video", f"{ep['id']}: generation_type default mismatch"
 
 
 def test_alpha_mode_options_cover_enum():

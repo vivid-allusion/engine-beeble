@@ -1,7 +1,7 @@
 # engine-beeble
 
-Engine wrapper for the [Beeble AI](https://beeble.ai) API — SwitchX
-video/image compositing.
+Engine wrapper for the [Beeble AI](https://beeble.ai) API — SwitchX video
+compositing.
 
 Part of the [studiolot](https://github.com/vivid-allusion/studiolot) Vehicle /
 Engine / SDK architecture. This repo wraps the Beeble REST API behind the
@@ -98,15 +98,15 @@ Base URL: `https://api.beeble.ai/v1` (default). Override per profile with
   is set; otherwise it is an error.
 - `generation_type` is set from the profile `parameters.generation_type`
   (TOML default), falling back to the profile `media_type` (`image`/`video`).
+  Video-only for now: the shipped catalog has `switchx-video` only.
 
 ## Endpoint models
 
 Endpoint TOML definitions live in `endpoints/`. Each file defines a model's
 valid parameter ranges — the "bounds" that the AppWizard reads to build
-select menus. Beeble currently exposes one model (SwitchX) in two flavors:
+select menus. Beeble currently exposes one model (video-only for now):
 
 - `switchx-video` (`VID-Models/`) — video compositing
-- `switchx-image` (`IMG-Models/`) — image compositing
 
 ## Repo structure
 
@@ -118,11 +118,10 @@ engine-beeble/
 │   ├── datatypes.py         ← InputFile, OutputFile, ProgressEvent, EngineError
 │   ├── metadata.py          ← zero-dependency constants (studiolot imports this)
 │   ├── endpoints/
-│   │   ├── IMG-Models/      ← switchx-image.toml
 │   │   ├── VID-Models/      ← switchx-video.toml
 │   │   ├── TXT-Models/      ← (reserved)
 │   │   └── Vision-Models/   ← (reserved)
-│   └── profiles/standby/    ← publishable standby YAMLs (IMG/VID shelves)
+│   └── profiles/standby/    ← publishable standby YAMLs (VID shelf)
 ├── requirements.txt         ← requests>=2.28
 ├── .env.example             ← BEEBLE_API_KEY template
 ├── pyproject.toml           ← pip install engine-beeble

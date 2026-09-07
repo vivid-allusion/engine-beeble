@@ -33,9 +33,11 @@ discover this Engine, load it via `engine_loader.py`, and call
   valid parameter ranges. Generated from the provider's own docs snapshot
   (engine-beeble-docs repo) + the published OpenAPI spec — never invented.
 - **`profiles/standby/`** contains publishable YAML profiles, organized by
-  media category (`IMG/` and `VID/`) mirroring `endpoints/`. When installed,
-  these are seeded into Vehicle repos' `USER-FILES/02.STANDBY/`, filtered by
-  the loading Vehicle's declared media type.
+  media category (`VID/`) mirroring `endpoints/`. When installed, these are
+  seeded into Vehicle repos' `USER-FILES/02.STANDBY/`, filtered by the
+  loading Vehicle's declared media type. **Video-only for now** (MC only) —
+  the `switchx-image` model was removed from the catalog; reinstate from git
+  history when image compositing is needed.
 
 ### Provider details
 
@@ -78,8 +80,8 @@ Vehicles find this Engine via `engine_loader.py`:
 | `engine_beeble/datatypes.py` | InputFile, OutputFile, ProgressEvent, EngineError |
 | `engine_beeble/metadata.py` | Zero-dependency identity constants (studiolot reads this) |
 | `engine_beeble/__init__.py` | Re-exports Engine + all datatypes + `list_standby_profiles(media_type)` shelf selector |
-| `engine_beeble/endpoints/` | TOML model catalog (IMG/VID) |
-| `engine_beeble/profiles/standby/` | Publishable YAML profiles by category (IMG/VID) |
+| `engine_beeble/endpoints/` | TOML model catalog (VID) |
+| `engine_beeble/profiles/standby/` | Publishable YAML profiles by category (VID) |
 | `tests/test_engine.py` | Unit tests (interface + job flow, fully mocked) |
 | `tests/test_endpoints.py` | TOML catalog integrity tests |
 | `pyproject.toml` | Package metadata, pip-installable |
@@ -96,7 +98,9 @@ OpenAPI spec: `https://api.beeble.ai/developer-api-docs/openapi.json`
 - 2026-09-06 — Created engine-beeble: gold-parity interface (engine-replicate
   datatypes verbatim), async job client (POST /v1/switchx/generations → poll
   → download render), `x-api-key` auth, SwitchX media routing (source_uri +
-  reference_image_uri/alpha_uri named slots, optional prompt), 2-model TOML
-  catalog generated from the docs snapshot + OpenAPI spec, VID/IMG standby
-  shelves, 62 tests green. Live smoke test + ★ human review pending — no API
-  key yet.
+  reference_image_uri/alpha_uri named slots, optional prompt), TOML catalog
+  generated from the docs snapshot + OpenAPI spec, VID standby shelf,
+  62 tests green. Live smoke test + ★ human review pending — no API key yet.
+- 2026-09-06 — Video-only scope: `switchx-image` model + IMG shelf removed
+  from the catalog (MC video work only); exhaustive standby YAML (all
+  alpha_mode/max_resolution values + advanced options commented).
