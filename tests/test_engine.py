@@ -575,17 +575,21 @@ class TestImports:
         assert all("VID" in p.parts for p in vids)
         assert any(p.name == "switchx-video_720p_auto.yaml" for p in vids)
 
-    def test_list_standby_profiles_img_shelf_empty(self):
+    def test_list_standby_profiles_img_shelf(self):
         from engine_beeble import list_standby_profiles
 
-        assert list_standby_profiles("IMG") == []
+        imgs = list_standby_profiles("IMG")
+        assert imgs
+        assert all("IMG" in p.parts for p in imgs)
+        assert any(p.name == "switchx-image_1080p_auto.yaml" for p in imgs)
 
     def test_no_filter_returns_every_shelf(self):
         from engine_beeble import list_standby_profiles
 
         all_profiles = list_standby_profiles()
         vids = list_standby_profiles("VID")
-        assert all_profiles == vids
+        imgs = list_standby_profiles("IMG")
+        assert len(all_profiles) == len(vids) + len(imgs)
 
     def test_unknown_media_type_returns_empty(self):
         from engine_beeble import list_standby_profiles
