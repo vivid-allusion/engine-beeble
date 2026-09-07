@@ -1,0 +1,24 @@
+# SwitchX Image — 1080p · Alpha custom
+platform: beeble
+endpoint: switchx-image
+media_type: image
+image_url_param: source_uri
+slots: ["reference_image_uri", "alpha_uri"]
+parameters:
+  #alpha_mode: "auto"    # AI detects the foreground
+  #alpha_mode: "fill"    # Keep the scene as-is
+  #alpha_mode: "select"    # Single keyframe mask (requires alpha_uri)
+  alpha_mode: "custom"    # Full mask (requires alpha_uri)
+  #max_resolution: 720   # 720p
+  max_resolution: 1080   # 1080p · Default
+
+  # Advanced parameters (uncomment to use)
+  #generation_type: "image"  # valid: "image" | "video"
+  #seed: 123456789           # valid: 0-4294967295; omitted = random seed each run
+  #callback_url: "https://your-server.com/webhook"  # HTTPS webhook notified on completion/failure
+  #idempotency_key: "order-123"                     # deterministic key; retries return the existing job
+# Pricing: TBD — no published rates in the beeble docs snapshot
+
+# Prompt: optional when reference_image_uri is provided
+# Reference image: pass via InputFile.references['reference_image_uri']
+# Alpha mask: pass via InputFile.references['alpha_uri'] (select/custom modes)

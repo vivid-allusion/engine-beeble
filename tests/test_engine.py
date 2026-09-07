@@ -571,17 +571,23 @@ class TestImports:
         from engine_beeble import list_standby_profiles
 
         vids = list_standby_profiles("VID")
-        assert vids
+        assert len(vids) == 8
         assert all("VID" in p.parts for p in vids)
-        assert any(p.name == "switchx-video_720p_auto.yaml" for p in vids)
+        names = {p.name for p in vids}
+        for am in ("auto", "fill", "select", "custom"):
+            for res in ("720", "1080"):
+                assert f"switchx-video_{res}p_alpha_{am}.yaml" in names
 
     def test_list_standby_profiles_img_shelf(self):
         from engine_beeble import list_standby_profiles
 
         imgs = list_standby_profiles("IMG")
-        assert imgs
+        assert len(imgs) == 8
         assert all("IMG" in p.parts for p in imgs)
-        assert any(p.name == "switchx-image_1080p_auto.yaml" for p in imgs)
+        names = {p.name for p in imgs}
+        for am in ("auto", "fill", "select", "custom"):
+            for res in ("720", "1080"):
+                assert f"switchx-image_{res}p_alpha_{am}.yaml" in names
 
     def test_no_filter_returns_every_shelf(self):
         from engine_beeble import list_standby_profiles

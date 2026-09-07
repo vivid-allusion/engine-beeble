@@ -1,18 +1,16 @@
-# SwitchX Image — 1080p · Auto alpha
+# SwitchX Image — 720p · Alpha select
 platform: beeble
 endpoint: switchx-image
 media_type: image
 image_url_param: source_uri
 slots: ["reference_image_uri", "alpha_uri"]
 parameters:
-  alpha_mode: "auto"
-  # Alternative alpha_mode values (uncomment to use)
+  #alpha_mode: "auto"    # AI detects the foreground
   #alpha_mode: "fill"    # Keep the scene as-is
-  #alpha_mode: "select"  # Single keyframe mask (requires alpha_uri)
-  #alpha_mode: "custom"  # Full mask (requires alpha_uri)
-  max_resolution: 1080
-  # Alternative max_resolution values (uncomment to use)
-  #max_resolution: 720   # 720p
+  alpha_mode: "select"    # Single keyframe mask (requires alpha_uri)
+  #alpha_mode: "custom"    # Full mask (requires alpha_uri)
+  max_resolution: 720   # 720p
+  #max_resolution: 1080   # 1080p · Default
 
   # Advanced parameters (uncomment to use)
   #generation_type: "image"  # valid: "image" | "video"
