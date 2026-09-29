@@ -49,7 +49,7 @@ engine = Engine(profile=profile, output_dir="/tmp/out")
 
 inputs = [
     InputFile(
-        path=Path("bullet-001.md"),
+        path=Path("markdown-001.md"),
         prompt="re-skin the scene with golden-hour lighting",
         reference_urls=["https://example.com/source.mp4"],
         references={
@@ -78,7 +78,7 @@ Get a key at: https://developer.beeble.ai/api-keys
 Beeble is an async job API. `POST /v1/switchx/generations` creates a SwitchX
 compositing job and returns a job ID (`swx_...`); the Engine polls
 `GET /v1/switchx/generations/{job_id}` until `completed` (then downloads
-`output.render`) or `failed` (the job error is surfaced per bullet).
+`output.render`) or `failed` (the job error is surfaced per Markdown file).
 Output URLs expire after 72 hours — the Engine downloads immediately.
 
 Base URL: `https://api.beeble.ai/v1` (default). Override per profile with
