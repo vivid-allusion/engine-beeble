@@ -1,15 +1,15 @@
 ## Architecture: Engine SDK Wrapper
 
 This repo is an **Engine** in the studiolot ecosystem. It wraps the **Beeble**
-API (SwitchX compositing) and exposes a uniform interface that Vehicles call.
+API (SwitchX compositing) and exposes a uniform interface that Generators call.
 
 ### The layers
 
 ```
-studiolot (TUI) → Vehicle (script) → **Beeble Engine** → Provider API
+studiolot (TUI) → Generator (script) → **Beeble Engine** → Provider API
 ```
 
-Vehicles like Frame Composer and Motion Conductor are SDK-agnostic. They
+Generators like Image Generator and Video Generator are SDK-agnostic. They
 discover this Engine, load it via `engine_loader.py`, and call
 `engine.run(inputs)`. This Engine handles all **Beeble**-specific logic.
 
@@ -18,11 +18,11 @@ discover this Engine, load it via `engine_loader.py`, and call
 - **`Engine.__init__` is PURE.** No network I/O in the constructor. It only
   stores: profile dict, output_dir, api_key, on_progress callback.
 - **`Engine.run(inputs: list[InputFile]) -> list[OutputFile]`** is the ONLY
-  entry point Vehicles call. Returns ALL results — success and failure —
+  entry point Generators call. Returns ALL results — success and failure —
   as OutputFile objects. Never raises for per-Markdown-file failures.
 - **Error results carry `expected_path`**: the destination filename is
   precomputed BEFORE the API call (profile `output_format`/media default
-  extension) so Vehicles can write error placeholders at the exact name.
+  extension) so Generators can write error placeholders at the exact name.
 - **`EngineError`** is for unrecoverable pre-flight failures only: missing
   API key, invalid profile.
 - **`datatypes.py`** defines InputFile, OutputFile, ProgressEvent,
@@ -34,9 +34,9 @@ discover this Engine, load it via `engine_loader.py`, and call
   (engine-beeble-docs repo) + the published OpenAPI spec — never invented.
 - **`profiles/standby/`** contains publishable YAML profiles, organized by
   media category (`IMG/` and `VID/`) mirroring `endpoints/`. When installed,
-  these are seeded into Vehicle repos' `USER-FILES/02.STANDBY/`, filtered by
-  the loading Vehicle's declared media type (Frame Composer → IMG, Motion
-  Conductor → VID).
+  these are seeded into Generator repos' `USER-FILES/02.STANDBY/`, filtered by
+  the loading Generator's declared media type (Image Generator → IMG,
+  Video Generator → VID).
 
 ### Provider details
 
@@ -53,7 +53,7 @@ discover this Engine, load it via `engine_loader.py`, and call
 
 ### Engine discovery
 
-Vehicles find this Engine via `engine_loader.py`:
+Generators find this Engine via `engine_loader.py`:
 - Repo directory: `engine-beeble`
 - Python package: `engine_beeble`
 - `engine_loader.py` handles the hyphen→underscore mapping
