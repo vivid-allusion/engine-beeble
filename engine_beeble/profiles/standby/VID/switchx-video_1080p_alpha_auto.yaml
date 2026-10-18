@@ -2,6 +2,7 @@
 platform: beeble
 endpoint: switchx-video
 media_type: video
+concurrency: 2
 image_url_param: source_uri
 slots: ["reference_image_uri", "alpha_uri"]
 parameters:

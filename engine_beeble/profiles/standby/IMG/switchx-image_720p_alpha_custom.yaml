@@ -2,6 +2,7 @@
 platform: beeble
 endpoint: switchx-image
 media_type: image
+concurrency: 3
 image_url_param: source_uri
 slots: ["reference_image_uri", "alpha_uri"]
 parameters:
