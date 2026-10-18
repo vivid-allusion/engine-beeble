@@ -14,24 +14,7 @@ import threading
 from .datatypes import OutputFile
 
 
-class BatchState:
-    def __init__(self):
-        self._lock = threading.Lock()
-        self._stop = False
-
-    def is_stopped(self) -> bool:
-        with self._lock:
-            return self._stop
-
-    def halt(self):
-        with self._lock:
-            self._stop = True
-
-    def note_success(self):
-        pass
-
-
-def run_item(engine, session, item, idx, total, state) -> list[OutputFile]:
+def run_item(engine, session, item, idx, total) -> list[OutputFile]:
     params = dict(engine._profile.get("parameters", {}))
     stem = item.path.stem
     current = idx + 1
@@ -69,7 +52,7 @@ def run_item(engine, session, item, idx, total, state) -> list[OutputFile]:
                     error_msg="Missing source media (source_uri required)",
                     media_type=media_type,
                     expected_path=expected,
-                )
+            )
             ]
 
         saved = engine._run_job(
@@ -93,9 +76,8 @@ def run_item(engine, session, item, idx, total, state) -> list[OutputFile]:
                     error_msg="No output returned from Beeble",
                     media_type=media_type,
                     expected_path=expected,
-                )
+            )
             ]
-        state.note_success()
         return [
             OutputFile(
                 source_path=item.path,
@@ -125,21 +107,16 @@ def run_batch(engine, inputs) -> list[OutputFile]:
     session = requests.Session()
     session.headers["x-api-key"] = engine._resolve_api_key()
 
-    state = BatchState()
     results: list[list[OutputFile] | None] = [None] * len(inputs)
     inflight_cap = max(1, engine._concurrency)
 
     with concurrent.futures.ThreadPoolExecutor(max_workers=inflight_cap) as pool:
         pending: dict[concurrent.futures.Future, int] = {}
         next_idx = 0
-        while pending or (next_idx < len(inputs) and not state.is_stopped()):
-            while (
-                not state.is_stopped()
-                and next_idx < len(inputs)
-                and len(pending) < inflight_cap
-            ):
+        while next_idx < len(inputs) or pending:
+            while next_idx < len(inputs) and len(pending) < inflight_cap:
                 future = pool.submit(
-                    run_item, engine, session, inputs[next_idx], next_idx, len(inputs), state
+                    run_item, engine, session, inputs[next_idx], next_idx, len(inputs)
                 )
                 pending[future] = next_idx
                 next_idx += 1

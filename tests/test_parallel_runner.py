@@ -62,7 +62,7 @@ def run_engine(profile, out_dir, behavior, n=3, frozen=True):
 
             real_run_item = runner_module.run_item
 
-            def watching(engine, session, item, idx, total, state):
+            def watching(engine, session, item, idx, total):
                 with watch["lock"]:
                     watch["cur"] += 1
                     watch["max"] = max(watch["max"], watch["cur"])
@@ -70,8 +70,8 @@ def run_engine(profile, out_dir, behavior, n=3, frozen=True):
                     time.sleep(0.02 + (hash(threading.current_thread()) % 11) * 0.002)
                     raise_ = behavior(index=idx, item=item)
                     if raise_ is not None:
-                        return real_run_item(engine, session, item, idx, total, state)
-                    probe_outputs = real_run_item(engine, session, item, idx, total, state)
+                        return real_run_item(engine, session, item, idx, total)
+                    probe_outputs = real_run_item(engine, session, item, idx, total)
                     if probe_outputs and probe_outputs[0].status == "ok":
                         expected = _expected_of(engine, item, idx)
                         probe_outputs[0].path = expected if expected is not None else probe_outputs[0].path
