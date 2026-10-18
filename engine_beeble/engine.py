@@ -7,12 +7,13 @@ from datetime import datetime
 from pathlib import Path
 
 from .datatypes import EngineError, InputFile, OutputFile, ProgressEvent
+from .profile_helpers import BeebleProfileHelper
 
 _CREATE_PATH = "/switchx/generations"
 _JOB_PATH = "/switchx/generations/{job_id}"
 
 
-class Engine:
+class Engine(BeebleProfileHelper):
     PLATFORM: str = "beeble"
     PROVIDER_NAME: str = "Beeble"
     PROVIDER_HOMEPAGE: str = "https://beeble.ai"
@@ -51,6 +52,11 @@ class Engine:
 
         import requests
 
+        if self._concurrency > 1:
+            from . import runner
+
+            return runner.run_batch(self, inputs)
+
         session = requests.Session()
         session.headers["x-api-key"] = self._resolve_api_key()
 
@@ -58,11 +64,6 @@ class Engine:
         save_alpha = self._save_alpha(params)
         media_type = self._profile.get("media_type", "") or "video"
         self._output_dir.mkdir(parents=True, exist_ok=True)
-
-        if self._concurrency > 1:
-            from . import runner
-
-            return runner.run_batch(self, inputs)
 
         results: list[OutputFile] = []
         total = len(inputs)
@@ -326,17 +327,6 @@ class Engine:
             return ".webp"
         if data[4:8] == b"ftyp":
             return ".mp4"
-        output_format = (
-            str(self._profile.get("parameters", {}).get("output_format", "") or "")
-            .strip()
-            .lstrip(".")
-            .lower()
-        )
-        if output_format and all(c.isalnum() for c in output_format):
-            return f".{output_format}"
-        return ".mp4" if media_type == "video" else ".png"
-
-    def _default_extension(self, media_type: str) -> str:
         output_format = (
             str(self._profile.get("parameters", {}).get("output_format", "") or "")
             .strip()
