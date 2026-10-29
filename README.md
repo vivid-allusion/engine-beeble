@@ -152,3 +152,7 @@ engine-beeble/
 ```
 
 See `docs/architecture/ENGINE_CONTRACT.md` §6 in studiolot.
+
+## License
+
+MIT, see [LICENSE](LICENSE).
